@@ -1,0 +1,306 @@
+{
+  "version": "0.0.1",
+  "name": "gso",
+  "instructions": [
+    {
+      "name": "config",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "gsoState",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "soAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "soState",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "soBaseVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "soBaseAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "soQuoteAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "soBaseMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "soQuoteMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "soOptionMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "stakingOptionsProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "xBaseMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "baseVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "periodNum",
+          "type": "u64"
+        },
+        {
+          "name": "lockupRatioTokensPerMillion",
+          "type": "u64"
+        },
+        {
+          "name": "optionExpiration",
+          "type": "u64"
+        },
+        {
+          "name": "subscriptionPeriodEnd",
+          "type": "u64"
+        },
+        {
+          "name": "lotSize",
+          "type": "u64"
+        },
+        {
+          "name": "numTokens",
+          "type": "u64"
+        },
+        {
+          "name": "projectName",
+          "type": "string"
+        },
+        {
+          "name": "strikePrice",
+          "type": "u64"
+        },
+        {
+          "name": "soAuthorityBump",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "stake",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "gsoState",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "soAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "soOptionMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "soUserOptionAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "soState",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "stakingOptionsProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "xBaseMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userBaseAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userXBaseAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "baseVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "unstake",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "gsoState",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "xBaseMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userBaseAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userXBaseAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "baseVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "GSOState",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "periodNum",
+            "type": "u64"
+          },
+          {
+            "name": "subscriptionPeriodEnd",
+            "type": "u64"
+          },
+          {
+            "name": "lockupRatioTokensPerMillion",
+            "type": "u64"
+          },
+          {
+            "name": "gsoStateBump",
+            "type": "u8"
+          },
+          {
+            "name": "soAuthorityBump",
+            "type": "u8"
+          },
+          {
+            "name": "xBaseMintBump",
+            "type": "u8"
+          },
+          {
+            "name": "baseVaultBump",
+            "type": "u8"
+          },
+          {
+            "name": "strike",
+            "type": "u64"
+          },
+          {
+            "name": "projectName",
+            "type": "string"
+          },
+          {
+            "name": "stakingOptionsState",
+            "type": "publicKey"
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "NotYetExpired",
+      "msg": "Attempted to perform an action for a vault not yet expired"
+    }
+  ],
+  "metadata": {
+    "address": "DuALd6fooWzVDkaTsQzDAxPGYCnLrnWamdNNTNxicdX8"
+  }
+}
