@@ -249,7 +249,7 @@ export class GSO {
   /**
    * Create an instruction for unstake
    */
-  public async createUntakeInstruction(
+  public async createUnstakeInstruction(
     amount: number,
     projectName: string,
     authority: PublicKey,
