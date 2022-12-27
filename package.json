@@ -7,6 +7,9 @@
   "license": "ISC",
   "types": "lib/index.d.ts",
   "homepage": "https://github.com/DualFinance/gso",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc",
     "prebuild": "yarn clean",
