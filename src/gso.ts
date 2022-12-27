@@ -20,10 +20,10 @@ import {
 } from '@project-serum/anchor';
 import {
   StakingOptions,
-  STAKING_OPTIONS_PK
+  STAKING_OPTIONS_PK,
 } from '@dual-finance/staking-options';
-import gsoIdl from './gso.json';
 import { getAssociatedTokenAddress } from '@project-serum/associated-token';
+import gsoIdl from './gso.json';
 
 export const GSO_PK: PublicKey = new PublicKey('DuALd6fooWzVDkaTsQzDAxPGYCnLrnWamdNNTNxicdX8');
 
@@ -151,9 +151,9 @@ export class GSO {
     );
     const so = new StakingOptions(this.connection.rpcEndpoint);
 
-    const soState = await so.state("GSO" + projectName, baseMint);
-    const soBaseVault = await so.baseVault("GSO" + projectName, baseMint);
-    const soOptionMint = await so.soMint(strike, "GSO" + projectName, baseMint);
+    const soState = await so.state(`GSO${projectName}`, baseMint);
+    const soBaseVault = await so.baseVault(`GSO${projectName}`, baseMint);
+    const soOptionMint = await so.soMint(strike, `GSO${projectName}`, baseMint);
     const xBaseMint = await this.xBaseMint(gsoState);
     const baseVault = await this.baseVault(gsoState);
 
@@ -213,11 +213,11 @@ export class GSO {
     );
     const so = new StakingOptions(this.connection.rpcEndpoint);
 
-    const soState = await so.state("GSO" + projectName, baseMint);
-    const soStateObj = await so.getState("GSO" + projectName, baseMint);
+    const soState = await so.state(`GSO${projectName}`, baseMint);
+    const soStateObj = await so.getState(`GSO${projectName}`, baseMint);
     const strike = soStateObj.strikes[0];
 
-    const soOptionMint = await so.soMint(strike, "GSO" + projectName, baseMint);
+    const soOptionMint = await so.soMint(strike, `GSO${projectName}`, baseMint);
     const xBaseMint = await this.xBaseMint(gsoState);
     const baseVault = await this.baseVault(gsoState);
 
@@ -276,5 +276,4 @@ export class GSO {
       },
     );
   }
-
 }
