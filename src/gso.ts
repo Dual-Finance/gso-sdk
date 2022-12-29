@@ -129,16 +129,17 @@ export class GSO {
    * Create an instruction for config
    */
   public async createConfigInstruction(
-    lockupRatioTokensPerMillion: number,
+    lockupRatioPerMillionLots: number,
     optionExpiration: number,
-    numTokens: number,
+    numTokensAtoms: number,
     projectName: string,
-    strike: number,
+    strikeAtomsPerLot: number,
     authority: PublicKey,
     baseMint: PublicKey,
     quoteMint: PublicKey,
     baseAccount: PublicKey,
     quoteAccount: PublicKey,
+    lotSize: number,
   ): Promise<web3.TransactionInstruction> {
     const gsoState = await this.state(projectName);
 
@@ -153,7 +154,7 @@ export class GSO {
 
     const soState = await so.state(`GSO${projectName}`, baseMint);
     const soBaseVault = await so.baseVault(`GSO${projectName}`, baseMint);
-    const soOptionMint = await so.soMint(strike, `GSO${projectName}`, baseMint);
+    const soOptionMint = await so.soMint(strikeAtomsPerLot, `GSO${projectName}`, baseMint);
     const xBaseMint = await this.xBaseMint(gsoState);
     const baseVault = await this.baseVault(gsoState);
 
@@ -161,13 +162,13 @@ export class GSO {
 
     return this.program.instruction.config(
       new BN(1), /* period_num */
-      new BN(lockupRatioTokensPerMillion),
+      new BN(lockupRatioPerMillionLots),
       new BN(optionExpiration),
       new BN(optionExpiration), /* subscription_period_end */
-      new BN(1), /* lot_size */
-      new BN(numTokens),
+      new BN(lotSize), /* lot_size */
+      new BN(numTokensAtoms),
       projectName,
-      new BN(strike),
+      new BN(strikeAtomsPerLot),
       soAuthorityBump,
       {
         accounts: {
