@@ -131,7 +131,7 @@ export class GSO {
   public async createConfigInstruction(
     lockupRatioPerMillionLots: number,
     optionExpiration: number,
-    numTokensAtoms: number,
+    numTokensAtoms: BN,
     projectName: string,
     strikeAtomsPerLot: number,
     authority: PublicKey,
@@ -166,7 +166,7 @@ export class GSO {
       new BN(optionExpiration),
       new BN(optionExpiration), /* subscription_period_end */
       new BN(lotSize), /* lot_size */
-      new BN(numTokensAtoms),
+      numTokensAtoms,
       projectName,
       new BN(strikeAtomsPerLot),
       soAuthorityBump,
