@@ -277,4 +277,44 @@ export class GSO {
       },
     );
   }
+
+  /**
+   * Create an instruction for withdraw
+   */
+  public async createWithdrawInstruction(
+    projectName: string,
+    baseMint: PublicKey,
+    authority: PublicKey,
+    userBaseAccount: PublicKey,
+  ): Promise<web3.TransactionInstruction> {
+    const gsoState = await this.state(projectName);
+    const baseVault = await this.baseVault(gsoState);
+
+    const so = new StakingOptions(this.connection.rpcEndpoint);
+    const soState = await so.state(`GSO${projectName}`, baseMint);
+
+    const [soAuthority, _soAuthorityBump] = await web3.PublicKey.findProgramAddress(
+      [
+        Buffer.from(utils.bytes.utf8.encode('gso')),
+        gsoState.toBuffer(),
+      ],
+      this.program.programId,
+    );
+
+    return this.program.instruction.withdraw(
+      {
+        accounts: {
+          authority,
+          gsoState,
+          soState,
+          soAuthority,
+          soBaseVault: baseVault,
+          userBaseAccount,
+          stakingOptionsProgram: STAKING_OPTIONS_PK,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          systemProgram: web3.SystemProgram.programId,
+        },
+      },
+    );
+  }
 }
