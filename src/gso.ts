@@ -288,9 +288,9 @@ export class GSO {
     userBaseAccount: PublicKey,
   ): Promise<web3.TransactionInstruction> {
     const gsoState = await this.state(projectName);
-    const baseVault = await this.baseVault(gsoState);
-
     const so = new StakingOptions(this.connection.rpcEndpoint);
+    const soBaseVault = await so.baseVault(`GSO${projectName}`, baseMint);
+
     const soState = await so.state(`GSO${projectName}`, baseMint);
 
     const [soAuthority, _soAuthorityBump] = await web3.PublicKey.findProgramAddress(
@@ -308,7 +308,7 @@ export class GSO {
           gsoState,
           soState,
           soAuthority,
-          soBaseVault: baseVault,
+          soBaseVault,
           userBaseAccount,
           stakingOptionsProgram: STAKING_OPTIONS_PK,
           tokenProgram: TOKEN_PROGRAM_ID,
