@@ -241,6 +241,57 @@
           "type": "u64"
         }
       ]
+    },
+    {
+      "name": "withdraw",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "gsoState",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "soAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userBaseAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "soBaseVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "soState",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "stakingOptionsProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -288,6 +339,10 @@
           {
             "name": "stakingOptionsState",
             "type": "publicKey"
+          },
+          {
+            "name": "authority",
+            "type": "publicKey"
           }
         ]
       }
@@ -299,8 +354,5 @@
       "name": "NotYetExpired",
       "msg": "Attempted to perform an action for a vault not yet expired"
     }
-  ],
-  "metadata": {
-    "address": "DuALd6fooWzVDkaTsQzDAxPGYCnLrnWamdNNTNxicdX8"
-  }
+  ]
 }
