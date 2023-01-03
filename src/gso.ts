@@ -279,6 +279,40 @@ export class GSO {
   }
 
   /**
+   * Create an instruction for exercise
+   */
+  public async createExerciseInstruction(
+    amount: BN,
+    strike: BN,
+    authority: PublicKey,
+    state: PublicKey,
+    optionMint: PublicKey,
+    userSoAccount: PublicKey,
+    userQuoteAccount: PublicKey,
+    quoteProjectAccount: PublicKey,
+    feeQuoteAccount: PublicKey,
+    baseVault: PublicKey,
+    userBaseAccount: PublicKey
+  ): Promise<web3.TransactionInstruction> {
+    
+    // @ts-ignore
+    return this.program.instruction.exercise(amount, strike, {
+      accounts: {
+        authority,
+        state,
+        userSoAccount,
+        optionMint,
+        userQuoteAccount,
+        projectQuoteAccount: quoteProjectAccount,
+        feeQuoteAccount,
+        baseVault,
+        userBaseAccount,
+        tokenProgram: TOKEN_PROGRAM_ID,
+      },
+    });
+  }
+
+  /**
    * Create an instruction for withdraw
    */
   public async createWithdrawInstruction(
