@@ -292,9 +292,8 @@ export class GSO {
     quoteProjectAccount: PublicKey,
     feeQuoteAccount: PublicKey,
     baseVault: PublicKey,
-    userBaseAccount: PublicKey
+    userBaseAccount: PublicKey,
   ): Promise<web3.TransactionInstruction> {
-    
     // @ts-ignore
     return this.program.instruction.exercise(amount, strike, {
       accounts: {
