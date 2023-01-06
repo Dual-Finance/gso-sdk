@@ -26,6 +26,7 @@ import { getAssociatedTokenAddress } from '@project-serum/associated-token';
 import gsoIdl from './gso.json';
 
 export const GSO_PK: PublicKey = new PublicKey('DuALd6fooWzVDkaTsQzDAxPGYCnLrnWamdNNTNxicdX8');
+const metaplexId = new PublicKey('metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s');
 
 /**
  * API class with functions to interact with the Staking Options Program using Solana Web3 JS API
@@ -188,6 +189,74 @@ export class GSO {
           tokenProgram: TOKEN_PROGRAM_ID,
           systemProgram: web3.SystemProgram.programId,
           rent: web3.SYSVAR_RENT_PUBKEY,
+        },
+      },
+    );
+  }
+
+  /**
+   * Create an instruction for name tokens
+   * TODO: Once returning multiple insructions, merge this with config
+   */
+  public async createNameTokensInstruction(
+    projectName: string,
+    strikeAtomsPerLot: number,
+    authority: PublicKey,
+    baseMint: PublicKey,
+    quoteMint: PublicKey,
+    baseAccount: PublicKey,
+    quoteAccount: PublicKey,
+  ): Promise<web3.TransactionInstruction> {
+    const gsoState = await this.state(projectName);
+
+    const [soAuthority, _soAuthorityBump] = await web3.PublicKey.findProgramAddress(
+      [
+        Buffer.from(utils.bytes.utf8.encode('gso')),
+        gsoState.toBuffer(),
+      ],
+      this.program.programId,
+    );
+    const so = new StakingOptions(this.connection.rpcEndpoint);
+
+    const soState = await so.state(`GSO${projectName}`, baseMint);
+    const soOptionMint = await so.soMint(strikeAtomsPerLot, `GSO${projectName}`, baseMint);
+    const xBaseMint = await this.xBaseMint(gsoState);
+
+    const [optionMetadata, _optionMintMetadataBump] = (
+      await web3.PublicKey.findProgramAddress(
+        [
+          Buffer.from(utils.bytes.utf8.encode('metadata')),
+          metaplexId.toBuffer(),
+          soOptionMint.toBuffer(),
+        ],
+        metaplexId,
+      ));
+
+    const [xBaseMetadata, _xBaseMintMetadataAccountBump] = (
+      await web3.PublicKey.findProgramAddress(
+        [
+          Buffer.from(utils.bytes.utf8.encode('metadata')),
+          metaplexId.toBuffer(),
+          xBaseMint.toBuffer(),
+        ],
+        metaplexId,
+      ));
+
+    return this.program.instruction.nameTokens(
+      {
+        accounts: {
+          authority,
+          gsoState,
+          xBaseMint,
+          xBaseMetadata,
+          soAuthority,
+          soState,
+          soOptionMint,
+          optionMetadata,
+          stakingOptionsProgram: STAKING_OPTIONS_PK,
+          tokenMetadataProgram: metaplexId,
+          rent: web3.SYSVAR_RENT_PUBKEY,
+          systemProgram: web3.SystemProgram.programId,
         },
       },
     );

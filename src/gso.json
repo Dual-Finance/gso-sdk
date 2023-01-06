@@ -1,5 +1,5 @@
 {
-  "version": "0.0.2",
+  "version": "0.0.3",
   "name": "gso",
   "instructions": [
     {
@@ -18,7 +18,11 @@
         {
           "name": "soAuthority",
           "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "SO Config",
+            "========="
+          ]
         },
         {
           "name": "soState",
@@ -53,7 +57,11 @@
         {
           "name": "soOptionMint",
           "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "SO Init Strike",
+            "========="
+          ]
         },
         {
           "name": "stakingOptionsProgram",
@@ -146,7 +154,10 @@
         {
           "name": "soOptionMint",
           "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "The so_option_mint is verified inside the SO CPI."
+          ]
         },
         {
           "name": "soUserOptionAccount",
@@ -156,7 +167,11 @@
         {
           "name": "soState",
           "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "Seeds are verified in the CPI. Verified that this is the correct",
+            "so_state here."
+          ]
         },
         {
           "name": "stakingOptionsProgram",
@@ -263,17 +278,27 @@
         {
           "name": "userBaseAccount",
           "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "Where the tokens are going."
+          ]
         },
         {
           "name": "soBaseVault",
           "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "Where the tokens are coming from."
+          ]
         },
         {
           "name": "soState",
           "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "Seeds are verified in the CPI. Verified that this is the correct",
+            "so_state here."
+          ]
         },
         {
           "name": "stakingOptionsProgram",
@@ -287,6 +312,75 @@
         },
         {
           "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "nameTokens",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "soState",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "gsoState",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "xBaseMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "xBaseMetadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenMetadataProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "soAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "soOptionMint",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Checked in the CPI"
+          ]
+        },
+        {
+          "name": "optionMetadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "stakingOptionsProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
           "isMut": false,
           "isSigner": false
         }
@@ -342,6 +436,10 @@
           },
           {
             "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "baseMint",
             "type": "publicKey"
           }
         ]
