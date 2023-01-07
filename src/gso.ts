@@ -203,9 +203,6 @@ export class GSO {
     strikeAtomsPerLot: number,
     authority: PublicKey,
     baseMint: PublicKey,
-    quoteMint: PublicKey,
-    baseAccount: PublicKey,
-    quoteAccount: PublicKey,
   ): Promise<web3.TransactionInstruction> {
     const gsoState = await this.state(projectName);
 
