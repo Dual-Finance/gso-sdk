@@ -166,8 +166,8 @@ export class GSO {
       new BN(1), /* period_num */
       new BN(lockupRatioPerMillionLots),
       new BN(optionExpiration),
-      new BN(subscriptionExpiration), /* subscription_period_end */
-      new BN(lotSize), /* lot_size */
+      new BN(subscriptionExpiration),
+      new BN(lotSize),
       numTokensAtoms,
       projectName,
       new BN(strikeAtomsPerLot),
