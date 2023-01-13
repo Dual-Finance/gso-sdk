@@ -132,7 +132,7 @@ export class GSO {
   public async createConfigInstruction(
     lockupRatioPerMillionLots: number,
     optionExpiration: number,
-    subscriptionExpiration: number,
+    subscriptionPeriodEnd: number,
     numTokensAtoms: BN,
     projectName: string,
     strikeAtomsPerLot: number,
@@ -166,7 +166,7 @@ export class GSO {
       new BN(1), /* period_num */
       new BN(lockupRatioPerMillionLots),
       new BN(optionExpiration),
-      new BN(subscriptionExpiration),
+      new BN(subscriptionPeriodEnd),
       new BN(lotSize),
       numTokensAtoms,
       projectName,
