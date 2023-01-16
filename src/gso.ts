@@ -131,6 +131,7 @@ export class GSO {
    */
   public async createConfigInstruction(
     lockupRatioPerMillionLots: number,
+    lockupPeriodEnd: number,
     optionExpiration: number,
     subscriptionPeriodEnd: number,
     numTokensAtoms: BN,
@@ -165,6 +166,7 @@ export class GSO {
     return this.program.instruction.config(
       new BN(1), /* period_num */
       new BN(lockupRatioPerMillionLots),
+      new BN(lockupPeriodEnd),
       new BN(optionExpiration),
       new BN(subscriptionPeriodEnd),
       new BN(lotSize),
