@@ -104,6 +104,10 @@
           "type": "u64"
         },
         {
+          "name": "lockupPeriodEnd",
+          "type": "u64"
+        },
+        {
           "name": "optionExpiration",
           "type": "u64"
         },
@@ -441,6 +445,10 @@
           {
             "name": "baseMint",
             "type": "publicKey"
+          },
+          {
+            "name": "lockupPeriodEnd",
+            "type": "u64"
           }
         ]
       }
@@ -451,6 +459,14 @@
       "code": 6000,
       "name": "NotYetExpired",
       "msg": "Attempted to perform an action for a vault not yet expired"
+    },
+    {
+      "code": 6001,
+      "name": "InvalidLockupEnd",
+      "msg": "Lockup end cannot be before subscription period end"
     }
-  ]
+  ],
+  "metadata": {
+    "address": "DuALd6fooWzVDkaTsQzDAxPGYCnLrnWamdNNTNxicdX8"
+  }
 }
