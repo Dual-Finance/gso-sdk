@@ -15,22 +15,27 @@
     "prebuild": "yarn clean",
     "clean": "rimraf lib",
     "lint": "eslint --ext .ts src",
-    "lint:fix": "eslint --ext .ts --fix src"
+    "lint:fix": "eslint --ext .ts --fix src",
+    "test": "jest"
   },
   "dependencies": {
     "@dual-finance/staking-options": "^0.0.17",
     "@project-serum/anchor": "^0.25.0",
     "@project-serum/associated-token": "^0.1.1",
     "@solana/spl-token": "^0.3.6",
-    "@solana/web3.js": "^1.66.2"
+    "@solana/web3.js": "^1.66.2",
+    "dotenv": "^16.0.3"
   },
   "devDependencies": {
+    "@types/jest": "^29.5.1",
     "@typescript-eslint/eslint-plugin": "^5.27.1",
     "@typescript-eslint/parser": "^5.27.1",
     "eslint": "^7.32.0 || ^8.2.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.25.2",
+    "jest": "^29.5.0",
     "rimraf": "^3.0.2",
+    "ts-jest": "^29.1.0",
     "typescript": "^5.0.2"
   }
 }
