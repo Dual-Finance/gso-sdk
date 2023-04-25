@@ -6,9 +6,7 @@ import {
   Keypair,
   PublicKey,
 } from '@solana/web3.js';
-import {
-  TOKEN_PROGRAM_ID,
-} from '@solana/spl-token';
+import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import {
   AnchorProvider,
   BN,
@@ -24,9 +22,42 @@ import {
 } from '@dual-finance/staking-options';
 import { getAssociatedTokenAddress } from '@project-serum/associated-token';
 import gsoIdl from './gso.json';
+import { parseGsoState } from './utils';
 
-export const GSO_PK: PublicKey = new PublicKey('DuALd6fooWzVDkaTsQzDAxPGYCnLrnWamdNNTNxicdX8');
+export const GSO_STATE_SIZE = 1000;
+export const GSO_PK: PublicKey = new PublicKey(
+  'DuALd6fooWzVDkaTsQzDAxPGYCnLrnWamdNNTNxicdX8',
+);
 const metaplexId = new PublicKey('metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s');
+
+interface SOState {
+  soName: string;
+  authority: PublicKey;
+  optionsAvailable: number;
+  optionExpiration: number;
+  subscriptionPeriodEnd: number;
+  baseDecimals: number;
+  quoteDecimals: number;
+  baseMint: PublicKey;
+  quoteMint: PublicKey;
+  quoteAccount: PublicKey;
+  lotSize: number;
+  stateBump: number;
+  vaultBump: number;
+  strikes: number[];
+}
+type GsoParams = {
+  soName: string;
+  lockupRatio: number;
+  lotSize: number;
+  expiration: number;
+  subscription: number;
+  base: PublicKey;
+  option: PublicKey;
+  strike: number;
+  gsoStatePk: PublicKey;
+  soStatePk: PublicKey;
+}
 
 /**
  * API class with functions to interact with the Staking Options Program using Solana Web3 JS API
@@ -64,11 +95,7 @@ export class GSO {
     };
 
     const provider = new AnchorProvider(this.connection, wallet, opts);
-    this.program = new Program(
-      gsoIdl as Idl,
-      GSO_PK,
-      provider,
-    );
+    this.program = new Program(gsoIdl as Idl, GSO_PK, provider);
   }
 
   /**
@@ -90,7 +117,7 @@ export class GSO {
     const [state, _stateBump] = await web3.PublicKey.findProgramAddress(
       [
         Buffer.from(utils.bytes.utf8.encode('GSO-state')),
-        GSO.toBeBytes(1), /* period_num */
+        GSO.toBeBytes(1) /* period_num */,
         Buffer.from(utils.bytes.utf8.encode(name)),
       ],
       this.program.programId,
@@ -103,10 +130,7 @@ export class GSO {
    */
   public async xBaseMint(gsoState: PublicKey): Promise<PublicKey> {
     const [xBaseMint, _xBaseMintBump] = await web3.PublicKey.findProgramAddress(
-      [
-        Buffer.from(utils.bytes.utf8.encode('xGSO')),
-        gsoState.toBuffer(),
-      ],
+      [Buffer.from(utils.bytes.utf8.encode('xGSO')), gsoState.toBuffer()],
       this.program.programId,
     );
     return xBaseMint;
@@ -117,10 +141,7 @@ export class GSO {
    */
   public async baseVault(gsoState: PublicKey): Promise<PublicKey> {
     const [baseVault, _baseVaultBump] = await web3.PublicKey.findProgramAddress(
-      [
-        Buffer.from(utils.bytes.utf8.encode('base-vault')),
-        gsoState.toBuffer(),
-      ],
+      [Buffer.from(utils.bytes.utf8.encode('base-vault')), gsoState.toBuffer()],
       this.program.programId,
     );
     return baseVault;
@@ -147,24 +168,25 @@ export class GSO {
     const gsoState = await this.state(projectName);
 
     const [soAuthority, soAuthorityBump] = await web3.PublicKey.findProgramAddress(
-      [
-        Buffer.from(utils.bytes.utf8.encode('gso')),
-        gsoState.toBuffer(),
-      ],
+      [Buffer.from(utils.bytes.utf8.encode('gso')), gsoState.toBuffer()],
       this.program.programId,
     );
     const so = new StakingOptions(this.connection.rpcEndpoint);
 
     const soState = await so.state(`GSO${projectName}`, baseMint);
     const soBaseVault = await so.baseVault(`GSO${projectName}`, baseMint);
-    const soOptionMint = await so.soMint(strikeAtomsPerLot, `GSO${projectName}`, baseMint);
+    const soOptionMint = await so.soMint(
+      strikeAtomsPerLot,
+      `GSO${projectName}`,
+      baseMint,
+    );
     const xBaseMint = await this.xBaseMint(gsoState);
     const baseVault = await this.baseVault(gsoState);
 
     // TODO: Init fee account if needed.
 
     return this.program.instruction.config(
-      new BN(1), /* period_num */
+      new BN(1) /* period_num */,
       new BN(lockupRatioPerMillionLots),
       new BN(lockupPeriodEnd),
       new BN(optionExpiration),
@@ -210,56 +232,53 @@ export class GSO {
     const gsoState = await this.state(projectName);
 
     const [soAuthority, _soAuthorityBump] = await web3.PublicKey.findProgramAddress(
-      [
-        Buffer.from(utils.bytes.utf8.encode('gso')),
-        gsoState.toBuffer(),
-      ],
+      [Buffer.from(utils.bytes.utf8.encode('gso')), gsoState.toBuffer()],
       this.program.programId,
     );
     const so = new StakingOptions(this.connection.rpcEndpoint);
 
     const soState = await so.state(`GSO${projectName}`, baseMint);
-    const soOptionMint = await so.soMint(strikeAtomsPerLot, `GSO${projectName}`, baseMint);
+    const soOptionMint = await so.soMint(
+      strikeAtomsPerLot,
+      `GSO${projectName}`,
+      baseMint,
+    );
     const xBaseMint = await this.xBaseMint(gsoState);
 
-    const [optionMetadata, _optionMintMetadataBump] = (
-      await web3.PublicKey.findProgramAddress(
-        [
-          Buffer.from(utils.bytes.utf8.encode('metadata')),
-          metaplexId.toBuffer(),
-          soOptionMint.toBuffer(),
-        ],
-        metaplexId,
-      ));
-
-    const [xBaseMetadata, _xBaseMintMetadataAccountBump] = (
-      await web3.PublicKey.findProgramAddress(
-        [
-          Buffer.from(utils.bytes.utf8.encode('metadata')),
-          metaplexId.toBuffer(),
-          xBaseMint.toBuffer(),
-        ],
-        metaplexId,
-      ));
-
-    return this.program.instruction.nameTokens(
-      {
-        accounts: {
-          authority,
-          gsoState,
-          xBaseMint,
-          xBaseMetadata,
-          soAuthority,
-          soState,
-          soOptionMint,
-          optionMetadata,
-          stakingOptionsProgram: STAKING_OPTIONS_PK,
-          tokenMetadataProgram: metaplexId,
-          rent: web3.SYSVAR_RENT_PUBKEY,
-          systemProgram: web3.SystemProgram.programId,
-        },
-      },
+    const [optionMetadata, _optionMintMetadataBump] = await web3.PublicKey.findProgramAddress(
+      [
+        Buffer.from(utils.bytes.utf8.encode('metadata')),
+        metaplexId.toBuffer(),
+        soOptionMint.toBuffer(),
+      ],
+      metaplexId,
     );
+
+    const [xBaseMetadata, _xBaseMintMetadataAccountBump] = await web3.PublicKey.findProgramAddress(
+      [
+        Buffer.from(utils.bytes.utf8.encode('metadata')),
+        metaplexId.toBuffer(),
+        xBaseMint.toBuffer(),
+      ],
+      metaplexId,
+    );
+
+    return this.program.instruction.nameTokens({
+      accounts: {
+        authority,
+        gsoState,
+        xBaseMint,
+        xBaseMetadata,
+        soAuthority,
+        soState,
+        soOptionMint,
+        optionMetadata,
+        stakingOptionsProgram: STAKING_OPTIONS_PK,
+        tokenMetadataProgram: metaplexId,
+        rent: web3.SYSVAR_RENT_PUBKEY,
+        systemProgram: web3.SystemProgram.programId,
+      },
+    });
   }
 
   /**
@@ -275,10 +294,7 @@ export class GSO {
     const gsoState = await this.state(projectName);
 
     const [soAuthority, _soAuthorityBump] = await web3.PublicKey.findProgramAddress(
-      [
-        Buffer.from(utils.bytes.utf8.encode('gso')),
-        gsoState.toBuffer(),
-      ],
+      [Buffer.from(utils.bytes.utf8.encode('gso')), gsoState.toBuffer()],
       this.program.programId,
     );
     const so = new StakingOptions(this.connection.rpcEndpoint);
@@ -292,28 +308,31 @@ export class GSO {
     const baseVault = await this.baseVault(gsoState);
 
     // TODO: Possibly init these.
-    const soUserOptionAccount = await getAssociatedTokenAddress(authority, soOptionMint);
-    const userXBaseAccount = await getAssociatedTokenAddress(authority, xBaseMint);
-
-    return this.program.instruction.stake(
-      new BN(amount),
-      {
-        accounts: {
-          authority,
-          gsoState,
-          soAuthority,
-          soOptionMint,
-          soState,
-          xBaseMint,
-          soUserOptionAccount,
-          userBaseAccount,
-          userXBaseAccount,
-          stakingOptionsProgram: STAKING_OPTIONS_PK,
-          baseVault,
-          tokenProgram: TOKEN_PROGRAM_ID,
-        },
-      },
+    const soUserOptionAccount = await getAssociatedTokenAddress(
+      authority,
+      soOptionMint,
     );
+    const userXBaseAccount = await getAssociatedTokenAddress(
+      authority,
+      xBaseMint,
+    );
+
+    return this.program.instruction.stake(new BN(amount), {
+      accounts: {
+        authority,
+        gsoState,
+        soAuthority,
+        soOptionMint,
+        soState,
+        xBaseMint,
+        soUserOptionAccount,
+        userBaseAccount,
+        userXBaseAccount,
+        stakingOptionsProgram: STAKING_OPTIONS_PK,
+        baseVault,
+        tokenProgram: TOKEN_PROGRAM_ID,
+      },
+    });
   }
 
   /**
@@ -329,22 +348,22 @@ export class GSO {
 
     const xBaseMint = await this.xBaseMint(gsoState);
     const baseVault = await this.baseVault(gsoState);
-    const userXBaseAccount = await getAssociatedTokenAddress(authority, xBaseMint);
-
-    return this.program.instruction.unstake(
-      new BN(amount),
-      {
-        accounts: {
-          authority,
-          gsoState,
-          xBaseMint,
-          userBaseAccount,
-          userXBaseAccount,
-          baseVault,
-          tokenProgram: TOKEN_PROGRAM_ID,
-        },
-      },
+    const userXBaseAccount = await getAssociatedTokenAddress(
+      authority,
+      xBaseMint,
     );
+
+    return this.program.instruction.unstake(new BN(amount), {
+      accounts: {
+        authority,
+        gsoState,
+        xBaseMint,
+        userBaseAccount,
+        userXBaseAccount,
+        baseVault,
+        tokenProgram: TOKEN_PROGRAM_ID,
+      },
+    });
   }
 
   /**
@@ -363,27 +382,83 @@ export class GSO {
     const soState = await so.state(`GSO${projectName}`, baseMint);
 
     const [soAuthority, _soAuthorityBump] = await web3.PublicKey.findProgramAddress(
-      [
-        Buffer.from(utils.bytes.utf8.encode('gso')),
-        gsoState.toBuffer(),
-      ],
+      [Buffer.from(utils.bytes.utf8.encode('gso')), gsoState.toBuffer()],
       this.program.programId,
     );
 
-    return this.program.instruction.withdraw(
-      {
-        accounts: {
-          authority,
-          gsoState,
-          soState,
-          soAuthority,
-          soBaseVault,
-          userBaseAccount,
-          stakingOptionsProgram: STAKING_OPTIONS_PK,
-          tokenProgram: TOKEN_PROGRAM_ID,
-          systemProgram: web3.SystemProgram.programId,
-        },
+    return this.program.instruction.withdraw({
+      accounts: {
+        authority,
+        gsoState,
+        soState,
+        soAuthority,
+        soBaseVault,
+        userBaseAccount,
+        stakingOptionsProgram: STAKING_OPTIONS_PK,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        systemProgram: web3.SystemProgram.programId,
       },
-    );
+    });
+  }
+
+  public async getGsos(): Promise<GsoParams[]> {
+    const { connection } = this;
+    const stakingOptions = new StakingOptions(connection.rpcEndpoint);
+    const data = await connection.getProgramAccounts(GSO_PK, {
+      filters: [{ dataSize: GSO_STATE_SIZE }],
+    });
+    const allGsoParams = [];
+    // eslint-disable-next-line no-restricted-syntax
+    for (const acct of data) {
+      if (acct.account.data.length !== GSO_STATE_SIZE) {
+        // eslint-disable-next-line no-continue
+        continue;
+      }
+      const {
+        soName,
+        stakingOptionsState,
+        subscriptionPeriodEnd,
+        strike,
+        lockupRatioTokensPerMillion,
+        baseMint,
+      } = parseGsoState(acct.account.data);
+      const lockupRatio = lockupRatioTokensPerMillion / 1000000;
+      const stakeTimeRemainingMs = subscriptionPeriodEnd * 1000 - Date.now();
+      const isTesting = soName.toLowerCase().includes('trial')
+        || soName.toLowerCase().includes('test');
+
+      if (
+        stakeTimeRemainingMs <= 0
+        || lockupRatio <= 0
+        || strike <= 0
+        || isTesting
+      ) {
+        // eslint-disable-next-line no-continue
+        continue;
+      }
+
+      // TODO: Unroll these and cache the fetches to improve page load.
+      const {
+        lotSize, quoteMint, optionExpiration,
+        // eslint-disable-next-line no-await-in-loop
+      } = (await stakingOptions.getState(
+        `GSO${soName}`,
+        baseMint,
+      )) as unknown as SOState;
+
+      allGsoParams.push({
+        soName,
+        lockupRatio,
+        lotSize,
+        strike,
+        expiration: optionExpiration,
+        subscription: subscriptionPeriodEnd,
+        base: baseMint,
+        option: quoteMint,
+        gsoStatePk: acct.pubkey,
+        soStatePk: stakingOptionsState,
+      });
+    }
+    return allGsoParams;
   }
 }
