@@ -6,17 +6,17 @@ env:
   CARGO_TERM_COLOR: always
 
 defaults:
-  runs-on: ubuntu-latest
-  strategy:
-      matrix:
-        node-version: [16.x, 18.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
   run:
     working-directory: ./
+    
 
 jobs:
   lint:
     name: Lint
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16.x, 18.x]
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
@@ -31,6 +31,10 @@ jobs:
   test:
     name: Test
     needs: lint
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16.x, 18.x]
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
