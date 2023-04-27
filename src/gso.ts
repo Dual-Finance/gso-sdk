@@ -24,7 +24,7 @@ import { getAssociatedTokenAddress } from '@project-serum/associated-token';
 import gsoIdl from './gso.json';
 import { parseGsoState } from './utils';
 
-export const GSO_STATE_SIZE = 1000;
+const GSO_STATE_SIZE = 1000;
 export const GSO_PK: PublicKey = new PublicKey(
   'DuALd6fooWzVDkaTsQzDAxPGYCnLrnWamdNNTNxicdX8',
 );
@@ -401,6 +401,9 @@ export class GSO {
     });
   }
 
+  /**
+   * Fetch all gsos
+   */
   public async getGsos(): Promise<GsoParams[]> {
     const { connection } = this;
     const stakingOptions = new StakingOptions(connection.rpcEndpoint);
@@ -408,12 +411,7 @@ export class GSO {
       filters: [{ dataSize: GSO_STATE_SIZE }],
     });
     const allGsoParams = [];
-    // eslint-disable-next-line no-restricted-syntax
     for (const acct of data) {
-      if (acct.account.data.length !== GSO_STATE_SIZE) {
-        // eslint-disable-next-line no-continue
-        continue;
-      }
       const {
         soName,
         stakingOptionsState,
@@ -433,14 +431,11 @@ export class GSO {
         || strike <= 0
         || isTesting
       ) {
-        // eslint-disable-next-line no-continue
         continue;
       }
 
-      // TODO: Unroll these and cache the fetches to improve page load.
       const {
         lotSize, quoteMint, optionExpiration,
-        // eslint-disable-next-line no-await-in-loop
       } = (await stakingOptions.getState(
         `GSO${soName}`,
         baseMint,

@@ -25,5 +25,8 @@ module.exports = {
     'no-plusplus': 0,
     'no-promise-executor-return': 0,
     'no-unused-vars': 0,
+    'no-continue': 0,
+    'no-await-in-loop': 0,
+    'no-restricted-syntax': 0,
   },
 };

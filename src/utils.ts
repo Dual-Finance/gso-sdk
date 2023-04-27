@@ -19,6 +19,7 @@ export function readBigUInt64LE(buffer: Buffer, offset = 0) {
     + last * 2 ** 24;
   return BigInt(lo) + (BigInt(hi) << BigInt(32));
 }
+
 export function parseGsoState(buf: Buffer) {
   const periodNum = Number(readBigUInt64LE(buf, 8));
   const subscriptionPeriodEnd = Number(readBigUInt64LE(buf, 16));

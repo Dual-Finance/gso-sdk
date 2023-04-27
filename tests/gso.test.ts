@@ -14,7 +14,6 @@ describe('gso-sdk', () => {
 
   it('can fetch gsos', async () => {
     const gsos = await client.getGsos();
-    console.info(gsos);
 
     expect(gsos).toBeTruthy();
     expect(gsos).toBeInstanceOf(Array);
