@@ -18,10 +18,13 @@ describe('gso-sdk', () => {
     expect(gsos).toBeTruthy();
     expect(gsos).toBeInstanceOf(Array);
     expect(gsos.length).toBeGreaterThanOrEqual(1);
+    // stake action requires soName, base, option, state and open subscription
+    // there should be expectations around those values being valid
     gsos.forEach((gso) => {
       expect(gso.soName).toBeTruthy();
       expect(gso.strike).toBeTruthy();
       expect(Number(gso.expiration) * 1000).toBeGreaterThan(Date.now());
+      expect(Number(gso.subscription) * 1000).toBeGreaterThan(Date.now());
       expect(gso.base).toBeTruthy();
       expect(gso.option).toBeTruthy();
       expect(gso.gsoStatePk).toBeTruthy();

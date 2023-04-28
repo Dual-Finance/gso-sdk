@@ -402,7 +402,9 @@ export class GSO {
   }
 
   /**
-   * Fetch all gsos
+   * Fetch all stakable GSOs from program accounts. A gso
+   * is stakable if its subcription period hasn't passed,
+   * has a non-zero lockup ratio and a non-zero strike.
    */
   public async getGsos(): Promise<GsoParams[]> {
     const { connection } = this;
