@@ -21,37 +21,36 @@ export function readBigUInt64LE(buffer: Buffer, offset = 0) {
 }
 
 export function parseGsoState(buf: Buffer) {
-  const periodNum = Number(readBigUInt64LE(buf, 8));
-  const subscriptionPeriodEnd = Number(readBigUInt64LE(buf, 16));
-  const lockupRatioTokensPerMillion = Number(readBigUInt64LE(buf, 24));
+  const periodNum = Number(buf.readBigUInt64LE(8));
+  const subscriptionPeriodEnd = Number(buf.readBigUInt64LE(16));
+  const lockupRatioTokensPerMillion = Number(buf.readBigUInt64LE(24));
   const gsoStateBump = Number(buf.readUInt8(32));
   const soAuthorityBump = Number(buf.readUInt8(33));
   const xBaseMintBump = Number(buf.readUInt8(34));
   const baseVaultBump = Number(buf.readUInt8(35));
-  const strike = Number(readBigUInt64LE(buf, 36));
+  const strike = Number(buf.readBigUInt64LE(36));
   const soNameLengthBytes = Number(buf.readUInt8(44));
-  // eslint-disable-next-line prefer-spread
   const soName = String.fromCharCode.apply(
     String,
     // @ts-ignore
-    buf.slice(48, 48 + soNameLengthBytes),
+    buf.subarray(48, 48 + soNameLengthBytes),
   );
   const soStateOffset = 48 + soNameLengthBytes;
   const stakingOptionsState = new PublicKey(
-    buf.slice(soStateOffset, soStateOffset + 32),
+    buf.subarray(soStateOffset, soStateOffset + 32),
   );
   const authority = new PublicKey(
-    buf.slice(soStateOffset + 32, soStateOffset + 32 + 32),
+    buf.subarray(soStateOffset + 32, soStateOffset + 32 + 32),
   );
   let baseMint = new PublicKey(
-    buf.slice(soStateOffset + 64, soStateOffset + 64 + 32),
+    buf.subarray(soStateOffset + 64, soStateOffset + 64 + 32),
   );
   if (baseMint.toBase58() === '11111111111111111111111111111111') {
     // Backwards compatibility hack.
     baseMint = new PublicKey(BONK_MINT_MAINNET);
   }
   let lockupPeriodEnd = Number(
-    readBigUInt64LE(buf.slice(soStateOffset + 96, soStateOffset + 96 + 32)),
+    buf.subarray(soStateOffset + 96, soStateOffset + 96 + 32).readBigUInt64LE(),
   );
   if (lockupPeriodEnd === 0) {
     // Backwards compatibility hack for subscription period
