@@ -7,10 +7,7 @@ import { GSO } from '../src';
 dotenv.config();
 
 describe('gso-sdk', () => {
-  const client = new GSO(
-    process.env.RPC_URL || clusterApiUrl('devnet'),
-    'confirmed',
-  );
+  const client = new GSO(process.env.RPC_URL || clusterApiUrl('mainnet-beta'));
 
   it('can fetch gsos', async () => {
     const gsos = await client.getGsos();

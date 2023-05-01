@@ -50,14 +50,14 @@ export type GsoParams = {
   periodNum: number;
   subscriptionPeriodEnd: number;
   lockupRatioTokensPerMillion: number;
-  strike: number;
-  projectName: string;
-  stakingOptionsState: PublicKey;
   authority: PublicKey;
   baseMint: PublicKey;
   lockupPeriodEnd: number;
   publicKey: PublicKey;
   // SO fields
+  strike: number;
+  projectName: string;
+  stakingOptionsState: PublicKey;
   lotSize: number;
   optionExpiration: number;
   quoteMint: PublicKey;
