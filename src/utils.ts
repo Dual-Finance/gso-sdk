@@ -1,24 +1,7 @@
+/* eslint-disable import/prefer-default-export */
 import { PublicKey } from '@solana/web3.js';
 
 const BONK_MINT_MAINNET = 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263';
-
-export function readBigUInt64LE(buffer: Buffer, offset = 0) {
-  const first = buffer[offset];
-  const last = buffer[offset + 7];
-  if (first === undefined || last === undefined) {
-    throw new Error();
-  }
-  let dynamicOffset = offset;
-  const lo = first
-    + buffer[++dynamicOffset] * 2 ** 8
-    + buffer[++dynamicOffset] * 2 ** 16
-    + buffer[++dynamicOffset] * 2 ** 24;
-  const hi = buffer[++dynamicOffset]
-    + buffer[++dynamicOffset] * 2 ** 8
-    + buffer[++dynamicOffset] * 2 ** 16
-    + last * 2 ** 24;
-  return BigInt(lo) + (BigInt(hi) << BigInt(32));
-}
 
 export function parseGsoState(buf: Buffer) {
   const periodNum = Number(buf.readBigUInt64LE(8));
