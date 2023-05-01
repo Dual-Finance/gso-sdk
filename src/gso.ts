@@ -446,8 +446,6 @@ export class GSO {
 
       if (
         stakeTimeRemainingMs <= 0
-        || lockupRatio <= 0
-        || strike <= 0
         || isTesting
       ) {
         continue;
