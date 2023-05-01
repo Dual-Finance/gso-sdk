@@ -46,17 +46,21 @@ interface SOState {
   vaultBump: number;
   strikes: number[];
 }
-type GsoParams = {
-  soName: string;
-  lockupRatio: number;
-  lotSize: number;
-  expiration: number;
-  subscription: number;
-  base: PublicKey;
-  option: PublicKey;
+export type GsoParams = {
+  periodNum: number;
+  subscriptionPeriodEnd: number;
+  lockupRatioTokensPerMillion: number;
   strike: number;
-  gsoStatePk: PublicKey;
-  soStatePk: PublicKey;
+  projectName: string;
+  stakingOptionsState: PublicKey;
+  authority: PublicKey;
+  baseMint: PublicKey;
+  lockupPeriodEnd: number;
+  publicKey: PublicKey;
+  // SO fields
+  lotSize: number;
+  optionExpiration: number;
+  quoteMint: PublicKey;
 }
 
 /**
@@ -434,17 +438,19 @@ export class GSO {
     const allGsoParams = [];
     for (const acct of data) {
       const {
-        soName,
+        projectName,
         stakingOptionsState,
         subscriptionPeriodEnd,
         strike,
         lockupRatioTokensPerMillion,
         baseMint,
+        authority,
+        lockupPeriodEnd,
+        periodNum,
       } = parseGsoState(acct.account.data);
-      const lockupRatio = lockupRatioTokensPerMillion / 1000000;
       const stakeTimeRemainingMs = subscriptionPeriodEnd * 1000 - Date.now();
-      const isTesting = soName.toLowerCase().includes('trial')
-        || soName.toLowerCase().includes('test');
+      const isTesting = projectName.toLowerCase().includes('trial')
+        || projectName.toLowerCase().includes('test');
 
       if (
         stakeTimeRemainingMs <= 0
@@ -456,21 +462,24 @@ export class GSO {
       const {
         lotSize, quoteMint, optionExpiration,
       } = (await stakingOptions.getState(
-        `GSO${soName}`,
+        `GSO${projectName}`,
         baseMint,
       )) as unknown as SOState;
 
       allGsoParams.push({
-        soName,
-        lockupRatio,
-        lotSize,
+        periodNum,
+        subscriptionPeriodEnd,
+        lockupRatioTokensPerMillion,
         strike,
-        expiration: optionExpiration,
-        subscription: subscriptionPeriodEnd,
-        base: baseMint,
-        option: quoteMint,
-        gsoStatePk: acct.pubkey,
-        soStatePk: stakingOptionsState,
+        projectName,
+        stakingOptionsState,
+        authority,
+        baseMint,
+        lockupPeriodEnd,
+        lotSize,
+        optionExpiration,
+        quoteMint,
+        publicKey: acct.pubkey,
       });
     }
     return allGsoParams;

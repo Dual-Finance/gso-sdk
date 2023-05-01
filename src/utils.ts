@@ -13,7 +13,7 @@ export function parseGsoState(buf: Buffer) {
   const baseVaultBump = Number(buf.readUInt8(35));
   const strike = Number(buf.readBigUInt64LE(36));
   const soNameLengthBytes = Number(buf.readUInt8(44));
-  const soName = String.fromCharCode.apply(
+  const projectName = String.fromCharCode.apply(
     String,
     // @ts-ignore
     buf.subarray(48, 48 + soNameLengthBytes),
@@ -49,7 +49,7 @@ export function parseGsoState(buf: Buffer) {
     baseVaultBump,
     strike,
     soNameLengthBytes,
-    soName,
+    projectName,
     stakingOptionsState,
     authority,
     baseMint,
