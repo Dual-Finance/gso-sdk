@@ -1,6 +1,8 @@
 name: Node.js CI
 on:
   push:
+    branches: master
+  pull_request:
 
 env:
   CARGO_TERM_COLOR: always
@@ -26,7 +28,6 @@ jobs:
 
   test:
     name: Test
-    needs: lint
     runs-on: ubuntu-latest
     strategy:
       matrix:
