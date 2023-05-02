@@ -21,5 +21,5 @@
     },
     "$schema": "https://json.schemastore.org/tsconfig",
     "display": "Recommended",
-    "exclude": ["tests/*", "test_scripts/*", "lib/*", "**/*.js"]
+    "exclude": ["tests/*", "lib/*", "**/*.js"]
 }
