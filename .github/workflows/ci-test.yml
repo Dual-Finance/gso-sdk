@@ -19,5 +19,6 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: "yarn"
+      - run: cp .env.example .env
       - run: yarn install --frozen-lockfile
       - run: yarn test
