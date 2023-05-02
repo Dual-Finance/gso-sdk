@@ -24,7 +24,7 @@ describe('gso-sdk', () => {
       expect(Number(gso.subscriptionPeriodEnd) * 1000).toBeGreaterThan(Date.now());
       expect(gso.baseMint).toBeTruthy();
       expect(gso.quoteMint).toBeTruthy();
-      expect(gso.publicKey).toBeTruthy();
+      expect(gso.gsoStatePk).toBeTruthy();
       expect(gso.stakingOptionsState).toBeTruthy();
     });
   });
