@@ -53,7 +53,7 @@ export type GsoParams = {
   authority: PublicKey;
   baseMint: PublicKey;
   lockupPeriodEnd: number;
-  publicKey: PublicKey;
+  gsoStatePk: PublicKey;
   // SO fields
   strike: number;
   projectName: string;
@@ -432,11 +432,11 @@ export class GSO {
   public async getGsos(): Promise<GsoParams[]> {
     const { connection } = this;
     const stakingOptions = new StakingOptions(connection.rpcEndpoint);
-    const data = await connection.getProgramAccounts(GSO_PK, {
+    const gsoAccounts = await connection.getProgramAccounts(GSO_PK, {
       filters: [{ dataSize: GSO_STATE_SIZE }],
     });
     const allGsoParams = [];
-    for (const acct of data) {
+    for (const gsoStateAccount of gsoAccounts) {
       const {
         projectName,
         stakingOptionsState,
@@ -447,7 +447,7 @@ export class GSO {
         authority,
         lockupPeriodEnd,
         periodNum,
-      } = parseGsoState(acct.account.data);
+      } = parseGsoState(gsoStateAccount.account.data);
       const stakeTimeRemainingMs = subscriptionPeriodEnd * 1000 - Date.now();
       const isTesting = projectName.toLowerCase().includes('trial')
         || projectName.toLowerCase().includes('test');
@@ -476,7 +476,7 @@ export class GSO {
         lotSize,
         optionExpiration,
         quoteMint,
-        publicKey: acct.pubkey,
+        gsoStatePk: gsoStateAccount.pubkey,
       });
     }
     return allGsoParams;
