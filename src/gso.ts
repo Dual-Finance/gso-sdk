@@ -6,9 +6,7 @@ import {
   Keypair,
   PublicKey,
 } from '@solana/web3.js';
-import {
-  TOKEN_PROGRAM_ID,
-} from '@solana/spl-token';
+import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import {
   AnchorProvider,
   BN,
@@ -24,9 +22,46 @@ import {
 } from '@dual-finance/staking-options';
 import { getAssociatedTokenAddress } from '@project-serum/associated-token';
 import gsoIdl from './gso.json';
+import { parseGsoState } from './utils';
 
-export const GSO_PK: PublicKey = new PublicKey('DuALd6fooWzVDkaTsQzDAxPGYCnLrnWamdNNTNxicdX8');
+const GSO_STATE_SIZE = 1000;
+export const GSO_PK: PublicKey = new PublicKey(
+  'DuALd6fooWzVDkaTsQzDAxPGYCnLrnWamdNNTNxicdX8',
+);
 const metaplexId = new PublicKey('metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s');
+
+interface SOState {
+  soName: string;
+  authority: PublicKey;
+  optionsAvailable: number;
+  optionExpiration: number;
+  subscriptionPeriodEnd: number;
+  baseDecimals: number;
+  quoteDecimals: number;
+  baseMint: PublicKey;
+  quoteMint: PublicKey;
+  quoteAccount: PublicKey;
+  lotSize: number;
+  stateBump: number;
+  vaultBump: number;
+  strikes: number[];
+}
+export type GsoParams = {
+  periodNum: number;
+  subscriptionPeriodEnd: number;
+  lockupRatioTokensPerMillion: number;
+  authority: PublicKey;
+  baseMint: PublicKey;
+  lockupPeriodEnd: number;
+  gsoStatePk: PublicKey;
+  // SO fields
+  strike: number;
+  projectName: string;
+  stakingOptionsState: PublicKey;
+  lotSize: number;
+  optionExpiration: number;
+  quoteMint: PublicKey;
+}
 
 /**
  * API class with functions to interact with the Staking Options Program using Solana Web3 JS API
@@ -385,5 +420,65 @@ export class GSO {
         },
       },
     );
+  }
+
+  /**
+   * Fetch all stakable GSOs from program accounts.
+   * Returns an array of GSO objects representing the account's
+   * metadata like name, strike, expiration and subscription timestamps;
+   * and its underlying staking option public key.
+   * Testing accounts are excluded from the return value.
+   */
+  public async getGsos(): Promise<GsoParams[]> {
+    const { connection } = this;
+    const stakingOptions = new StakingOptions(connection.rpcEndpoint);
+    const gsoAccounts = await connection.getProgramAccounts(GSO_PK, {
+      filters: [{ dataSize: GSO_STATE_SIZE }],
+    });
+    const allGsoParams = [];
+    for (const gsoStateAccount of gsoAccounts) {
+      const {
+        projectName,
+        stakingOptionsState,
+        subscriptionPeriodEnd,
+        strike,
+        lockupRatioTokensPerMillion,
+        baseMint,
+        authority,
+        lockupPeriodEnd,
+        periodNum,
+      } = parseGsoState(gsoStateAccount.account.data);
+      const stakeTimeRemainingMs = subscriptionPeriodEnd * 1000 - Date.now();
+      const isTesting = projectName.toLowerCase().includes('trial')
+        || projectName.toLowerCase().includes('test');
+
+      if (stakeTimeRemainingMs <= 0 || isTesting) {
+        continue;
+      }
+
+      const {
+        lotSize, quoteMint, optionExpiration,
+      } = (await stakingOptions.getState(
+        `GSO${projectName}`,
+        baseMint,
+      )) as unknown as SOState;
+
+      allGsoParams.push({
+        periodNum,
+        subscriptionPeriodEnd,
+        lockupRatioTokensPerMillion,
+        strike,
+        projectName,
+        stakingOptionsState,
+        authority,
+        baseMint,
+        lockupPeriodEnd,
+        lotSize,
+        optionExpiration,
+        quoteMint,
+        gsoStatePk: gsoStateAccount.pubkey,
+      });
+    }
+    return allGsoParams;
   }
 }

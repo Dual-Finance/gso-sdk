@@ -1,6 +1,8 @@
 name: Lint
 on:
   push:
+    branches: master
+  pull_request:
 
 env:
   CARGO_TERM_COLOR: always
@@ -13,10 +15,13 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v3
-      - name: Install eslint
-        run: yarn install
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: ".nvmrc"
+          cache: "yarn"
+      - run: yarn install --frozen-lockfile
       - name: Run ESLint
         run: yarn lint
