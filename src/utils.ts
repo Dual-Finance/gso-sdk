@@ -23,6 +23,7 @@ export function readBigUInt64LE(buffer: Buffer, offset = 0) {
   return BigInt(lo) + (BigInt(hi) << BigInt(32));
 }
 
+// TODO: update parser to use non-deprecated buffer methods
 export function parseGsoState(buf: Buffer) {
   const periodNum = Number(readBigUInt64LE(buf, 8));
   const subscriptionPeriodEnd = Number(readBigUInt64LE(buf, 16));
