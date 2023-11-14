@@ -452,7 +452,7 @@ export class GSO {
       const isTesting = projectName.toLowerCase().includes('trial')
         || projectName.toLowerCase().includes('test');
 
-      if (stakeTimeRemainingMs <= 0 || isTesting) {
+      if (stakeTimeRemainingMs <= 0 || isTesting || strike === 0) {
         continue;
       }
 
