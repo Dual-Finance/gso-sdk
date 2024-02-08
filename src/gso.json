@@ -138,6 +138,146 @@
       ]
     },
     {
+      "name": "configV2",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "gsoState",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "soAuthority",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "SO Config",
+            "========="
+          ]
+        },
+        {
+          "name": "soState",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "soBaseVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "soBaseAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "soQuoteAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "soBaseMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "soQuoteMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "soOptionMint",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "SO Init Strike",
+            "========="
+          ]
+        },
+        {
+          "name": "stakingOptionsProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "xBaseMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "lockupMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "baseVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "periodNum",
+          "type": "u64"
+        },
+        {
+          "name": "lockupRatioTokensPerMillion",
+          "type": "u64"
+        },
+        {
+          "name": "lockupPeriodEnd",
+          "type": "u64"
+        },
+        {
+          "name": "optionExpiration",
+          "type": "u64"
+        },
+        {
+          "name": "subscriptionPeriodEnd",
+          "type": "u64"
+        },
+        {
+          "name": "lotSize",
+          "type": "u64"
+        },
+        {
+          "name": "numTokens",
+          "type": "u64"
+        },
+        {
+          "name": "projectName",
+          "type": "string"
+        },
+        {
+          "name": "strikePrice",
+          "type": "u64"
+        },
+        {
+          "name": "soAuthorityBump",
+          "type": "u8"
+        }
+      ]
+    },
+    {
       "name": "stake",
       "accounts": [
         {
@@ -465,8 +605,5 @@
       "name": "InvalidLockupEnd",
       "msg": "Lockup end cannot be before subscription period end"
     }
-  ],
-  "metadata": {
-    "address": "DuALd6fooWzVDkaTsQzDAxPGYCnLrnWamdNNTNxicdX8"
-  }
+  ]
 }
