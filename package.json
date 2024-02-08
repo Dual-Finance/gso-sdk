@@ -1,6 +1,6 @@
 {
   "name": "@dual-finance/gso",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "description": "GSO SDK",
   "main": "lib/index.js",
   "author": "Dual Finance",
