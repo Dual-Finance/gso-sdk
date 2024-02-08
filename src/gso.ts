@@ -173,8 +173,9 @@ export class GSO {
     projectName: string,
     strikeAtomsPerLot: number,
     authority: PublicKey,
-    baseMint: PublicKey,
-    quoteMint: PublicKey,
+    lockupMint: PublicKey,
+    soBaseMint: PublicKey,
+    soQuoteMint: PublicKey,
     baseAccount: PublicKey,
     quoteAccount: PublicKey,
     lotSize: number,
@@ -190,15 +191,15 @@ export class GSO {
     );
     const so = new StakingOptions(this.connection.rpcEndpoint);
 
-    const soState = await so.state(`GSO${projectName}`, baseMint);
-    const soBaseVault = await so.baseVault(`GSO${projectName}`, baseMint);
-    const soOptionMint = await so.soMint(strikeAtomsPerLot, `GSO${projectName}`, baseMint);
+    const soState = await so.state(`GSO${projectName}`, soBaseMint);
+    const soBaseVault = await so.baseVault(`GSO${projectName}`, soBaseMint);
+    const soOptionMint = await so.soMint(strikeAtomsPerLot, `GSO${projectName}`, soBaseMint);
     const xBaseMint = await this.xBaseMint(gsoState);
     const baseVault = await this.baseVault(gsoState);
 
     // TODO: Init fee account if needed.
 
-    return this.program.instruction.config(
+    return this.program.instruction.configV2(
       new BN(1), /* period_num */
       new BN(lockupRatioPerMillionLots),
       new BN(lockupPeriodEnd),
@@ -218,8 +219,9 @@ export class GSO {
           soBaseVault,
           soBaseAccount: baseAccount,
           soQuoteAccount: quoteAccount,
-          soBaseMint: baseMint,
-          soQuoteMint: quoteMint,
+          lockupMint,
+          soBaseMint,
+          soQuoteMint,
           soOptionMint,
           xBaseMint,
           baseVault,
