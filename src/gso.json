@@ -1,9 +1,9 @@
 {
-  "version": "0.0.3",
+  "version": "0.0.4",
   "name": "gso",
   "instructions": [
     {
-      "name": "config",
+      "name": "configv2",
       "accounts": [
         {
           "name": "authority",
@@ -20,7 +20,7 @@
           "isMut": true,
           "isSigner": false,
           "docs": [
-            "SO Config",
+            "SO Config v2",
             "========="
           ]
         },
@@ -41,6 +41,11 @@
         },
         {
           "name": "soQuoteAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "lockupMint",
           "isMut": false,
           "isSigner": false
         },
