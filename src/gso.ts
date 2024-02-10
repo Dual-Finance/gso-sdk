@@ -5,22 +5,26 @@ import {
   ConnectionConfig,
   Keypair,
   PublicKey,
+  SYSVAR_RENT_PUBKEY,
+  SystemProgram,
+  TransactionInstruction,
 } from '@solana/web3.js';
-import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
+import {
+  TOKEN_PROGRAM_ID,
+  getAssociatedTokenAddressSync,
+} from '@solana/spl-token';
 import {
   AnchorProvider,
   BN,
   Program,
   Wallet,
   Idl,
-  web3,
   utils,
 } from '@project-serum/anchor';
 import {
   StakingOptions,
   STAKING_OPTIONS_PK,
 } from '@dual-finance/staking-options';
-import { getAssociatedTokenAddress } from '@project-serum/associated-token';
 import gsoIdl from './gso.json';
 import { parseGsoState } from './utils';
 
@@ -122,7 +126,7 @@ export class GSO {
    * Get the public key for the gso state.
    */
   public async state(name: string): Promise<PublicKey> {
-    const [state, _stateBump] = await web3.PublicKey.findProgramAddress(
+    const [state, _stateBump] = PublicKey.findProgramAddressSync(
       [
         Buffer.from(utils.bytes.utf8.encode('GSO-state')),
         GSO.toBeBytes(1), /* period_num */
@@ -137,11 +141,8 @@ export class GSO {
    * Get the public key for xBase token.
    */
   public async xBaseMint(gsoState: PublicKey): Promise<PublicKey> {
-    const [xBaseMint, _xBaseMintBump] = await web3.PublicKey.findProgramAddress(
-      [
-        Buffer.from(utils.bytes.utf8.encode('xGSO')),
-        gsoState.toBuffer(),
-      ],
+    const [xBaseMint, _xBaseMintBump] = PublicKey.findProgramAddressSync(
+      [Buffer.from(utils.bytes.utf8.encode('xGSO')), gsoState.toBuffer()],
       this.program.programId,
     );
     return xBaseMint;
@@ -151,11 +152,8 @@ export class GSO {
    * Get the public key for base vault.
    */
   public async baseVault(gsoState: PublicKey): Promise<PublicKey> {
-    const [baseVault, _baseVaultBump] = await web3.PublicKey.findProgramAddress(
-      [
-        Buffer.from(utils.bytes.utf8.encode('base-vault')),
-        gsoState.toBuffer(),
-      ],
+    const [baseVault, _baseVaultBump] = PublicKey.findProgramAddressSync(
+      [Buffer.from(utils.bytes.utf8.encode('base-vault')), gsoState.toBuffer()],
       this.program.programId,
     );
     return baseVault;
@@ -179,14 +177,11 @@ export class GSO {
     baseAccount: PublicKey,
     quoteAccount: PublicKey,
     lotSize: number,
-  ): Promise<web3.TransactionInstruction> {
+  ): Promise<TransactionInstruction> {
     const gsoState = await this.state(projectName);
 
-    const [soAuthority, soAuthorityBump] = await web3.PublicKey.findProgramAddress(
-      [
-        Buffer.from(utils.bytes.utf8.encode('gso')),
-        gsoState.toBuffer(),
-      ],
+    const [soAuthority, soAuthorityBump] = PublicKey.findProgramAddressSync(
+      [Buffer.from(utils.bytes.utf8.encode('gso')), gsoState.toBuffer()],
       this.program.programId,
     );
     const so = new StakingOptions(this.connection.rpcEndpoint);
@@ -227,8 +222,8 @@ export class GSO {
           baseVault,
           stakingOptionsProgram: STAKING_OPTIONS_PK,
           tokenProgram: TOKEN_PROGRAM_ID,
-          systemProgram: web3.SystemProgram.programId,
-          rent: web3.SYSVAR_RENT_PUBKEY,
+          systemProgram: SystemProgram.programId,
+          rent: SYSVAR_RENT_PUBKEY,
         },
       },
     );
@@ -243,14 +238,11 @@ export class GSO {
     strikeAtomsPerLot: number,
     authority: PublicKey,
     baseMint: PublicKey,
-  ): Promise<web3.TransactionInstruction> {
+  ): Promise<TransactionInstruction> {
     const gsoState = await this.state(projectName);
 
-    const [soAuthority, _soAuthorityBump] = await web3.PublicKey.findProgramAddress(
-      [
-        Buffer.from(utils.bytes.utf8.encode('gso')),
-        gsoState.toBuffer(),
-      ],
+    const [soAuthority, _soAuthorityBump] = PublicKey.findProgramAddressSync(
+      [Buffer.from(utils.bytes.utf8.encode('gso')), gsoState.toBuffer()],
       this.program.programId,
     );
     const so = new StakingOptions(this.connection.rpcEndpoint);
@@ -260,7 +252,7 @@ export class GSO {
     const xBaseMint = await this.xBaseMint(gsoState);
 
     const [optionMetadata, _optionMintMetadataBump] = (
-      await web3.PublicKey.findProgramAddress(
+      PublicKey.findProgramAddressSync(
         [
           Buffer.from(utils.bytes.utf8.encode('metadata')),
           metaplexId.toBuffer(),
@@ -270,7 +262,7 @@ export class GSO {
       ));
 
     const [xBaseMetadata, _xBaseMintMetadataAccountBump] = (
-      await web3.PublicKey.findProgramAddress(
+      PublicKey.findProgramAddressSync(
         [
           Buffer.from(utils.bytes.utf8.encode('metadata')),
           metaplexId.toBuffer(),
@@ -292,8 +284,8 @@ export class GSO {
           optionMetadata,
           stakingOptionsProgram: STAKING_OPTIONS_PK,
           tokenMetadataProgram: metaplexId,
-          rent: web3.SYSVAR_RENT_PUBKEY,
-          systemProgram: web3.SystemProgram.programId,
+          rent: SYSVAR_RENT_PUBKEY,
+          systemProgram: SystemProgram.programId,
         },
       },
     );
@@ -308,14 +300,11 @@ export class GSO {
     authority: PublicKey,
     baseMint: PublicKey,
     userBaseAccount: PublicKey,
-  ): Promise<web3.TransactionInstruction> {
+  ): Promise<TransactionInstruction> {
     const gsoState = await this.state(projectName);
 
-    const [soAuthority, _soAuthorityBump] = await web3.PublicKey.findProgramAddress(
-      [
-        Buffer.from(utils.bytes.utf8.encode('gso')),
-        gsoState.toBuffer(),
-      ],
+    const [soAuthority, _soAuthorityBump] = PublicKey.findProgramAddressSync(
+      [Buffer.from(utils.bytes.utf8.encode('gso')), gsoState.toBuffer()],
       this.program.programId,
     );
     const so = new StakingOptions(this.connection.rpcEndpoint);
@@ -329,8 +318,14 @@ export class GSO {
     const baseVault = await this.baseVault(gsoState);
 
     // TODO: Possibly init these.
-    const soUserOptionAccount = await getAssociatedTokenAddress(authority, soOptionMint);
-    const userXBaseAccount = await getAssociatedTokenAddress(authority, xBaseMint);
+    const soUserOptionAccount = getAssociatedTokenAddressSync(
+      soOptionMint,
+      authority,
+    );
+    const userXBaseAccount = getAssociatedTokenAddressSync(
+      xBaseMint,
+      authority,
+    );
 
     return this.program.instruction.stake(
       new BN(amount),
@@ -361,12 +356,12 @@ export class GSO {
     projectName: string,
     authority: PublicKey,
     userBaseAccount: PublicKey,
-  ): Promise<web3.TransactionInstruction> {
+  ): Promise<TransactionInstruction> {
     const gsoState = await this.state(projectName);
 
     const xBaseMint = await this.xBaseMint(gsoState);
     const baseVault = await this.baseVault(gsoState);
-    const userXBaseAccount = await getAssociatedTokenAddress(authority, xBaseMint);
+    const userXBaseAccount = getAssociatedTokenAddressSync(xBaseMint, authority);
 
     return this.program.instruction.unstake(
       new BN(amount),
@@ -392,18 +387,15 @@ export class GSO {
     baseMint: PublicKey,
     authority: PublicKey,
     userBaseAccount: PublicKey,
-  ): Promise<web3.TransactionInstruction> {
+  ): Promise<TransactionInstruction> {
     const gsoState = await this.state(projectName);
     const so = new StakingOptions(this.connection.rpcEndpoint);
     const soBaseVault = await so.baseVault(`GSO${projectName}`, baseMint);
 
     const soState = await so.state(`GSO${projectName}`, baseMint);
 
-    const [soAuthority, _soAuthorityBump] = await web3.PublicKey.findProgramAddress(
-      [
-        Buffer.from(utils.bytes.utf8.encode('gso')),
-        gsoState.toBuffer(),
-      ],
+    const [soAuthority, _soAuthorityBump] = PublicKey.findProgramAddressSync(
+      [Buffer.from(utils.bytes.utf8.encode('gso')), gsoState.toBuffer()],
       this.program.programId,
     );
 
@@ -418,7 +410,7 @@ export class GSO {
           userBaseAccount,
           stakingOptionsProgram: STAKING_OPTIONS_PK,
           tokenProgram: TOKEN_PROGRAM_ID,
-          systemProgram: web3.SystemProgram.programId,
+          systemProgram: SystemProgram.programId,
         },
       },
     );
